@@ -1,0 +1,6 @@
+node_modules
+.env
+npm-debug.log
+# db.json should be ignored if using a volume, but for first deploy it can be kept or excluded.
+# Better to exclude and let the server initialize it.
+db.json

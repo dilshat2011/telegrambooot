@@ -4,9 +4,9 @@
  */
 
 const API = {
-  auth: '/.netlify/functions/admin-auth',
-  stats: '/.netlify/functions/admin-stats',
-  actions: '/.netlify/functions/admin-actions'
+  auth: '/api/admin-auth',
+  stats: '/api/admin-stats',
+  actions: '/api/admin-actions'
 };
 
 class AdminPanel {

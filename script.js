@@ -21,7 +21,7 @@ const localProjects = [
 let projects = [...localProjects];
 let isLoggedIn = false;
 let currentUser = null;      // { phone, name }
-let otpToken = null;         // Netlify Function dan kelgan token
+let otpToken = null;         // Server dan kelgan token
 let timerInterval = null;
 let currentFilter = 'all';
 let userVotes = new Set();
@@ -33,7 +33,8 @@ function restoreSession() {
     const s = JSON.parse(localStorage.getItem('ab_session') || 'null');
     if (s?.phone && s?.loggedIn) {
       isLoggedIn = true;
-      currentUser = s;
+      currentUser = s.currentUser || s;
+      otpToken = s.otpToken;
       userVotes = new Set(s.votes || []);
       updateLoginButton();
     }
@@ -200,7 +201,11 @@ document.getElementById('castVoteBtn').addEventListener('click', async () => {
   const btn = document.getElementById('castVoteBtn');
   btn.textContent = '⏳ Jiberilmekte...'; btn.disabled = true;
   try {
-    const res = await apiPost(API.vote, { phone: currentUser.phone, projectId: selectedProject.id });
+    const res = await apiPost(API.vote, { 
+      phone: currentUser.phone, 
+      projectId: selectedProject.id,
+      token: otpToken // Passing the token to fix the "no token" error 
+    });
     if (res.success) {
       userVotes.add(selectedProject.id);
       if (res.project) selectedProject.votes = res.project.votes;
@@ -332,9 +337,10 @@ document.getElementById('sendCodeBtn').addEventListener('click', async () => {
     const res = await apiPost(API.sendOtp, { phone, name, surname });
     if (res.success) {
       isLoggedIn = true;
+      otpToken = res.token; // Store token from server
       currentUser = { phone, name: `${name} ${surname}` };
       localStorage.setItem('ab_session', JSON.stringify({
-        isLoggedIn, currentUser, votes: []
+        isLoggedIn, currentUser, otpToken, votes: []
       }));
       updateLoginButton();
       showStep('step3'); 
