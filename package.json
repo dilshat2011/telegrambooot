@@ -1,0 +1,9 @@
+{
+  "name": "open-budjet",
+  "version": "1.0.0",
+  "description": "Tashabbusli Byudjet - Netlify Functions",
+  "dependencies": {
+    "@netlify/blobs": "^7.3.0",
+    "node-fetch": "^3.3.2"
+  }
+}

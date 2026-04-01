@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="kaa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — Ashıq Byudjet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- Login Modal -->
+  <div id="adminLoginOverlay" class="admin-modal-overlay">
+    <div class="admin-login-card">
+      <div class="admin-login-header">
+        <div class="admin-logo">🏛️</div>
+        <h2>Admin Management</h2>
+        <p>Sársem gúz bolsın!</p>
+      </div>
+      <div class="admin-login-body">
+        <div class="form-group">
+          <label>Admin paroli</label>
+          <input type="password" id="adminPass" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <button id="adminLoginBtn" class="admin-btn-primary">Kiriw</button>
+        <p class="login-hint">Úlgi: 2011</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="admin-layout" id="adminDashboard" style="display:none">
+    
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">🏛️ ASHIQ BYUDJET</div>
+        <button class="sidebar-toggle" id="sidebarToggle">✕</button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">📊</span> Dashboard
+        </a>
+        <a href="#" class="nav-item" data-view="projects">
+          <span class="nav-icon">🏗️</span> Jobalar
+        </a>
+        <a href="#" class="nav-item" data-view="users">
+          <span class="nav-icon">👥</span> Paydalanıwshılar
+        </a>
+        <a href="#" class="nav-item" data-view="votes">
+          <span class="nav-icon">🗳️</span> Dawıslar
+        </a>
+        <a href="#" class="nav-item" data-view="categories">
+          <span class="nav-icon">📁</span> Kategoriyalar
+        </a>
+        <a href="#" class="nav-item" data-view="settings">
+          <span class="nav-icon">⚙️</span> Sazlamalar
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="adminLogoutBtn" class="logout-btn">
+          <span>🚪</span> Shıǵıw
+        </button>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="admin-main">
+      
+      <!-- Top Bar -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button id="openSidebar" class="sidebar-open">☰</button>
+          <h1 id="viewTitle">Dashboard</h1>
+        </div>
+        <div class="topbar-right">
+          <div class="admin-user">
+            <span class="admin-status-dot"></span>
+            <span class="admin-name">Administrator</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- View Container -->
+      <section class="admin-content" id="viewContainer">
+        
+        <!-- DASHBOARD VIEW -->
+        <div class="view-panel active-panel" id="view-dashboard">
+          <div class="stats-row">
+            <div class="stat-card-modern anim-slide-up">
+              <div class="sc-icon">🗳️</div>
+              <div class="sc-info">
+                <h3>Total Votes</h3>
+                <p id="statTotalVotes">0</p>
+              </div>
+            </div>
+            <div class="stat-card-modern anim-slide-up" style="animation-delay: 0.1s">
+              <div class="sc-icon">👥</div>
+              <div class="sc-info">
+                <h3>Users</h3>
+                <p id="statTotalUsers">0</p>
+              </div>
+            </div>
+            <div class="stat-card-modern anim-slide-up" style="animation-delay: 0.2s">
+              <div class="sc-icon">🏗️</div>
+              <div class="sc-info">
+                <h3>Finished</h3>
+                <p id="statTotalProjects">0</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="chart-card-modern anim-slide-up" style="animation-delay:0.3s">
+              <h3>Voting Trend (Real-time)</h3>
+              <div class="chart-wrapper">
+                <canvas id="votingTrendChart"></canvas>
+              </div>
+            </div>
+            <div class="ranking-card-modern anim-slide-up" style="animation-delay:0.4s">
+              <h3>Project Leaderboard</h3>
+              <div id="projectRankingList" class="ranking-list">
+                <!-- Leaderboard data goes here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROJECTS VIEW -->
+        <div class="view-panel" id="view-projects">
+          <div class="view-header">
+            <button class="admin-btn-accent" id="addNewProjectBtn">➕ Jańa joba qosıw</button>
+          </div>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Icon</th>
+                  <th>Atı</th>
+                  <th>Kategoriya</th>
+                  <th>Dawıslar</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="projectsTableBody">
+                <!-- Project rows go here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- USERS VIEW -->
+        <div class="view-panel" id="view-users">
+          <div class="view-header">
+            <div class="search-wrap">
+              <span>🔍</span>
+              <input type="text" placeholder="Search by name or phone..." id="userSearch" />
+            </div>
+            <button class="admin-btn-secondary" id="exportUsersBtn">📥 Excel (CSV)</button>
+          </div>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>F.I.O</th>
+                  <th>Phone No.</th>
+                  <th>Joined</th>
+                  <th>Votes Cast</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <!-- User rows go here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VOTES VIEW -->
+        <div class="view-panel" id="view-votes">
+          <div class="view-header">
+            <h3>🗳️ Barlıq dawıslar</h3>
+          </div>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Project</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="votesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CATEGORIES VIEW -->
+        <div class="view-panel" id="view-categories">
+          <div class="view-header">
+            <h3>📁 Kategoriyalardı basqarıw</h3>
+            <button class="admin-btn-accent" id="addCategoryBtn">➕ Kategoritya qosıw</button>
+          </div>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Icon</th>
+                  <th>Kategoriya atı</th>
+                  <th>Jobalar sanı</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="categoriesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SETTINGS VIEW -->
+        <div class="view-panel" id="view-settings">
+          <div class="view-header">
+            <h3>⚙️ Sayt sazlamaları</h3>
+          </div>
+          <div class="settings-card anim-slide-up">
+            <div class="form-group">
+              <label>Sayt atı</label>
+              <input type="text" id="sTitle" placeholder="Ashıq Byudjet" />
+            </div>
+            <div class="form-group">
+              <label>Voting Status</label>
+              <select id="sVoteStatus">
+                <option value="active">🟢 Active</option>
+                <option value="disabled">🔴 Disabled</option>
+              </select>
+            </div>
+            <button id="saveSettingsBtn" class="admin-btn-primary">Saqlaw</button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Project Edit Modal -->
+  <div id="projectModal" class="admin-modal-overlay">
+    <div class="admin-modal-card">
+      <div class="am-header">
+        <h2 id="projectModalTitle">Edit Project</h2>
+        <button class="am-close">✕</button>
+      </div>
+      <div class="am-body">
+        <div class="form-group">
+          <label>Project Name</label>
+          <input type="text" id="pName" placeholder="Mısal: Joba atı..." />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Icon (Emoji)</label>
+            <input type="text" id="pIcon" placeholder="🏗️" maxlength="2" />
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="pCategory">
+              <option value="Infrastruktura">Infrastruktura</option>
+              <option value="Ekologiya">Ekologiya</option>
+              <option value="Bilimlendiriw">Bilimlendiriw</option>
+              <option value="Sálametliklendiriw">Sálametliklendiriw</option>
+              <option value="Sport">Sport</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="pDesc" rows="4"></textarea>
+        </div>
+      </div>
+      <div class="am-footer">
+        <button class="admin-btn-cancel am-close">Biykar etiw</button>
+        <button class="admin-btn-success" id="saveProjectBtn">Saqlaw</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminToast" class="admin-toast"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
